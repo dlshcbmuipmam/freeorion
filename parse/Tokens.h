@@ -104,6 +104,7 @@
     (EffectsGroups)                             \
     (Else)                                      \
     (Empire)                                    \
+    (EmpireHasAdoptedPolicy)                    \
     (EmpireMeter)                               \
     (EmpireMeterValue)                          \
     (EmpireObjectVisibility)                    \
