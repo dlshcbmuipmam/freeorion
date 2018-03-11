@@ -60,9 +60,7 @@ public:
 
     /** \name Mutators */ //@{
     void SizeMove(const GG::Pt& ul, const GG::Pt& lr) override;
-
     void Render() override;
-
     void Reset();
     void Sanitize();
 
