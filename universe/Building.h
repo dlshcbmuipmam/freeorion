@@ -151,11 +151,11 @@ public:
 private:
     void Init();
 
-    std::string                                         m_name;
-    std::string                                         m_description;
+    std::string                                         m_name = "";
+    std::string                                         m_description = "";
     std::unique_ptr<ValueRef::ValueRefBase<double>>     m_production_cost;
     std::unique_ptr<ValueRef::ValueRefBase<int>>        m_production_time;
-    bool                                                m_producible;
+    bool                                                m_producible = false;
     CaptureResult                                       m_capture_result;
     std::set<std::string>                               m_tags;
     CommonParams::ConsumptionMap<MeterType>             m_production_meter_consumption;
@@ -163,7 +163,7 @@ private:
     std::unique_ptr<Condition::ConditionBase>           m_location;
     std::unique_ptr<Condition::ConditionBase>           m_enqueue_location;
     std::vector<std::shared_ptr<Effect::EffectsGroup>>  m_effects;
-    std::string                                         m_icon;
+    std::string                                         m_icon = "";
 };
 
 /** Holds all FreeOrion building types.  Types may be looked up by name. */
