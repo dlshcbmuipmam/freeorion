@@ -4169,7 +4169,10 @@ void DesignWnd::MainPanel::Sanitize() {
 void DesignWnd::MainPanel::SetPart(const std::string& part_name, unsigned int slot)
 { SetPart(GetPartType(part_name), slot); }
 
-void DesignWnd::MainPanel::SetPart(const PartType* part, unsigned int slot, bool emit_signal /* = false */, bool change_all_similar_parts /*= false*/) {
+void DesignWnd::MainPanel::SetPart(const PartType* part, unsigned int slot,
+                                   bool emit_signal /* = false */,
+                                   bool change_all_similar_parts /*= false*/)
+{
     //DebugLogger() << "DesignWnd::MainPanel::SetPart(" << (part ? part->Name() : "no part") << ", slot " << slot << ")";
     if (slot > m_slots.size()) {
         ErrorLogger() << "DesignWnd::MainPanel::SetPart specified nonexistant slot";
@@ -4233,7 +4236,9 @@ bool DesignWnd::MainPanel::AddPartEmptySlot(const PartType* part, int slot_numbe
     return true;
 }
 
-bool DesignWnd::MainPanel::AddPartWithSwapping(const PartType* part, std::pair<int, int> swap_and_empty_slot) {
+bool DesignWnd::MainPanel::AddPartWithSwapping(const PartType* part,
+                                               std::pair<int, int> swap_and_empty_slot)
+{
     if (!part || swap_and_empty_slot.first < 0 || swap_and_empty_slot.second < 0)
         return false;
     // Move the flexible part to the first open spot
