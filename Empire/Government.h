@@ -60,7 +60,7 @@ private:
     std::string                                         m_description = "";
     std::string                                         m_short_description = "";
     std::string                                         m_category = "";
-    std::unique_ptr<ValueRef::ValueRefBase<double>>     m_adoption_cost = nullptr;
+    std::unique_ptr<ValueRef::ValueRefBase<double>>     m_adoption_cost;
     std::vector<std::shared_ptr<Effect::EffectsGroup>>  m_effects;
     std::string                                         m_graphic = "";
 
