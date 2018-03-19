@@ -46,6 +46,17 @@
 
 FO_COMMON_API extern const int INVALID_DESIGN_ID;
 
+struct Availability {
+    // Declaring an enum inside a struct makes the syntax when using the enum 
+    // with tuples simpler, without polluting the global namespace with 3
+    // generic names.
+    enum Enum {
+        Obsolete,  // A design/part is researched/known by the player has marked it obsolete
+        Available, // A design/part is researched/known and currently available
+        Future     // A design/part is unresearched and hence not available
+    };
+};
+
 namespace {
     const std::string   PART_CONTROL_DROP_TYPE_STRING = "Part Control";
     const std::string   HULL_PARTS_ROW_DROP_TYPE_STRING = "Hull and Parts Row";
@@ -765,6 +776,7 @@ namespace {
     bool DisplayedShipDesignManager::IsKnown(const int id) const
     { return m_id_to_obsolete_and_loc.count(id); }
 
+
     boost::optional<bool> DisplayedShipDesignManager::IsObsolete(const int id) const {
         // A non boost::none value for a specific design overrides the hull and part values
         auto it_id = m_id_to_obsolete_and_loc.find(id);
@@ -952,7 +964,6 @@ namespace {
     //////////////////////////////////////////////////
     //  AvailabilityManager                         //
     //////////////////////////////////////////////////
-
     /** A class to allow the storage of the state of a GUI availabilty filter
         and the querying of that state WRT a ship design. */
     class AvailabilityManager {
@@ -1218,7 +1229,7 @@ public:
 private:
     std::shared_ptr<GG::StaticGraphic>  m_icon;
     std::shared_ptr<GG::StaticGraphic>  m_background;
-    const PartType*     m_part;
+    const PartType*                     m_part;
 };
 
 PartControl::PartControl(const PartType* part) :
@@ -1295,7 +1306,7 @@ public:
     };
 
     /** \name Structors */ //@{
-    PartsListBox(const AvailabilityManager& availabilities_state);
+    explicit PartsListBox(const AvailabilityManager& availabilities_state);
     //@}
 
     /** \name Accessors */ //@{
@@ -1333,8 +1344,8 @@ private:
                               ShipPartClass part_class, int empire_id, int loc_id) const;
 
     std::set<ShipPartClass>     m_part_classes_shown;   // which part classes should be shown
-    bool                        m_show_superfluous_parts;
-    int                         m_previous_num_columns;
+    bool                        m_show_superfluous_parts = true;
+    int                         m_previous_num_columns = -1;
     const AvailabilityManager&  m_availabilities_state;
 };
 
@@ -1394,9 +1405,6 @@ void PartsListBox::PartsListBoxRow::ChildrenDraggedAway(const std::vector<GG::Wn
 
 PartsListBox::PartsListBox(const AvailabilityManager& availabilities_state) :
     CUIListBox(),
-    m_part_classes_shown(),
-    m_show_superfluous_parts(true),
-    m_previous_num_columns(-1),
     m_availabilities_state(availabilities_state)
 {
     ManuallyManageColProps();
@@ -1424,11 +1432,12 @@ void PartsListBox::SizeMove(const GG::Pt& ul, const GG::Pt& lr) {
     }
 }
 
-/** Accept parts being discarded from the ship under design.*/
 void PartsListBox::AcceptDrops(const GG::Pt& pt,
                                std::vector<std::shared_ptr<GG::Wnd>> wnds,
                                GG::Flags<GG::ModKey> mod_keys)
 {
+    // Accept parts being discarded from the ship under design
+
     // If ctrl is pressed then signal all parts of the same type to be cleared.
     if (!(GG::GUI::GetGUI()->ModKeys() & GG::MOD_KEY_CTRL))
         return;
@@ -1436,8 +1445,8 @@ void PartsListBox::AcceptDrops(const GG::Pt& pt,
     if (wnds.empty())
         return;
 
-    const PartControl* control = boost::polymorphic_downcast<const PartControl*>(wnds.begin()->get());
-    const PartType* part_type = control ? control->Part() : nullptr;
+    auto* control = boost::polymorphic_downcast<const PartControl*>(wnds.begin()->get());
+    auto* part_type = control ? control->Part() : nullptr;
     if (!part_type)
         return;
 
@@ -1446,6 +1455,7 @@ void PartsListBox::AcceptDrops(const GG::Pt& pt,
 
 PartGroupsType PartsListBox::GroupAvailableDisplayableParts(const Empire* empire) const {
     PartGroupsType part_groups;
+
     // loop through all possible parts
     for (const auto& entry : GetPartTypeManager()) {
         const auto& part = entry.second;
@@ -1462,9 +1472,8 @@ PartGroupsType PartsListBox::GroupAvailableDisplayableParts(const Empire* empire
         if (!shown)
             continue;
 
-        for (ShipSlotType slot_type : part->MountableSlotTypes()) {
+        for (ShipSlotType slot_type : part->MountableSlotTypes())
             part_groups[{part_class, slot_type}].push_back(part.get());
-        }
     }
     return part_groups;
 }
@@ -1793,13 +1802,12 @@ private:
     void HandlePartTypeClicked(const PartType*, GG::Flags<GG::ModKey>);
     void HandlePartTypeRightClicked(const PartType*, const GG::Pt& pt);
 
-    std::shared_ptr<PartsListBox>   m_parts_list;
-
+    std::shared_ptr<PartsListBox>                               m_parts_list;
     std::map<ShipPartClass, std::shared_ptr<CUIStateButton>>    m_class_buttons;
     std::shared_ptr<CUIStateButton>                             m_superfluous_parts_button;
 
     // Holds the state of the availabilities filter.
-    AvailabilityManager m_availabilities_state;
+    AvailabilityManager                         m_availabilities_state;
     std::tuple<std::shared_ptr<CUIStateButton>,
                std::shared_ptr<CUIStateButton>,
                std::shared_ptr<CUIStateButton>> m_availabilities_buttons;
@@ -1968,9 +1976,9 @@ void DesignWnd::PartPalette::DoLayout() {
          BUTTON_EDGE_PAD, COL_OFFSET, ROW_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT]
         (GG::Wnd* avail_btn)
         {
-            if (num_non_class_buttons_per_row == 1)
+            if (num_non_class_buttons_per_row == 1) {
                 ++row;
-            else {
+            } else {
                 if (col >= NUM_CLASS_BUTTONS_PER_ROW + num_non_class_buttons_per_row - 1) {
                     col = NUM_CLASS_BUTTONS_PER_ROW - 1;
                     ++row;
