@@ -1152,9 +1152,6 @@ public:
     void ClearPolicy(const std::string& policy_name);
     //@}
 
-    /** emitted when the design is changed (by adding or removing policies, not
-      * name or description changes) */
-    mutable boost::signals2::signal<void (int, const std::string&)> PoliciesChangedSignal;
     mutable boost::signals2::signal<void (const Policy*, GG::Flags<GG::ModKey>)> PolicyClickedSignal;
 
 protected:
@@ -1164,7 +1161,6 @@ protected:
 private:
     void Populate();        //!< creates and places SlotControls for empire
     void DoLayout();        //!< positions SlotControls
-    void PoliciesChanged();
     bool AddPolicyEmptySlot(const Policy* policy, int slot_number);
     int FindEmptySlotForPolicy(const Policy* policy) const;
 
@@ -1190,9 +1186,6 @@ void GovernmentWnd::MainPanel::CompleteConstruction() {
 
     m_clear_button->LeftClickedSignal.connect(
         boost::bind(&GovernmentWnd::MainPanel::ClearPolicies, this));
-    PoliciesChangedSignal.connect(boost::bind(&GovernmentWnd::MainPanel::PoliciesChanged, this));
-
-    PoliciesChanged(); // Initialize components that rely on the current state of the government.
 
     CUIWnd::CompleteConstruction();
 
@@ -1412,9 +1405,6 @@ void GovernmentWnd::MainPanel::DoLayout() {
     }
 }
 
-void GovernmentWnd::MainPanel::PoliciesChanged()
-{}
-
 void GovernmentWnd::MainPanel::DropsAcceptable(DropsAcceptableIter first,
                                                DropsAcceptableIter last,
                                                const GG::Pt& pt,
@@ -1456,8 +1446,6 @@ void GovernmentWnd::CompleteConstruction() {
         boost::bind(&GovernmentWnd::InitializeWindows, this));
 
     AttachChild(m_main_panel);
-    m_main_panel->PoliciesChangedSignal.connect(
-        boost::bind(&GovernmentWnd::PoliciesChanged, this));
     m_main_panel->Sanitize();
 
     AttachChild(m_policy_palette);
@@ -1511,9 +1499,6 @@ void GovernmentWnd::InitializeWindows() {
     m_main_panel->      InitSizeMove(main_ul,      main_ul + main_wh);
     m_policy_palette->  InitSizeMove(palette_ul,   palette_ul + palette_wh);
 }
-
-void GovernmentWnd::PoliciesChanged()
-{ std::cout << "GovernmentWnd::PoliciesChanged()" << std::endl; }
 
 void GovernmentWnd::EnableOrderIssuing(bool enable/* = true*/)
 {}
