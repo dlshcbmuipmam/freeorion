@@ -94,10 +94,10 @@ namespace {
                 = ( tok.Part_
                 >   common_rules.more_common
                 >   label(tok.Class_)       > ship_part_class_enum
-                > -(  (label(tok.Capacity_)  > double_rule)
+                > -(  (label(tok.Capacity_) > double_rule)
                    | (label(tok.Damage_)    > double_rule)
                    )
-                > -(  (label(tok.Damage_)    > double_rule )   // damage is secondary for fighters
+                > -(  (label(tok.Damage_)   > double_rule )   // damage is secondary for fighters
                    | (label(tok.Shots_)     > double_rule )   // shots is secondary for direct fire weapons
                    )
                 > matches_[tok.NoDefaultCapacityEffect_]
@@ -124,20 +124,20 @@ namespace {
         }
 
         using  part_type_rule = parse::detail::rule<void (start_rule_payload&)>;
-
         using start_rule = parse::detail::rule<start_rule_signature>;
 
-        parse::detail::Labeller label;
-        const parse::conditions_parser_grammar condition_parser;
-        const parse::string_parser_grammar string_grammar;
-        parse::detail::tags_grammar tags_parser;
-        parse::detail::common_params_rules common_rules;
-        parse::ship_slot_enum_grammar  ship_slot_type_enum;
-        parse::ship_part_class_enum_grammar ship_part_class_enum;
-        parse::detail::double_grammar double_rule;
-        parse::detail::single_or_bracketed_repeat<parse::ship_slot_enum_grammar> one_or_more_slots;
-        part_type_rule                     part_type;
-        start_rule                         start;
+        parse::detail::Labeller                 label;
+        const parse::conditions_parser_grammar  condition_parser;
+        const parse::string_parser_grammar      string_grammar;
+        parse::detail::tags_grammar             tags_parser;
+        parse::detail::common_params_rules      common_rules;
+        parse::ship_slot_enum_grammar           ship_slot_type_enum;
+        parse::ship_part_class_enum_grammar     ship_part_class_enum;
+        parse::detail::double_grammar           double_rule;
+        parse::detail::single_or_bracketed_repeat<parse::ship_slot_enum_grammar>
+                                                one_or_more_slots;
+        part_type_rule                          part_type;
+        start_rule                              start;
     };
 
 }
