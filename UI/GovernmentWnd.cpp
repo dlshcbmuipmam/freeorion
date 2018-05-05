@@ -1239,7 +1239,7 @@ namespace {
 void GovernmentWnd::MainPanel::SetPolicy(const Policy* policy, unsigned int slot) {
     //DebugLogger() << "GovernmentWnd::MainPanel::SetPolicy(" << (policy ? policy->Name() : "no policy") << ", slot " << slot << ")";
 
-    if (slot > m_slots.size()) {
+    if (slot >= m_slots.size()) {
         ErrorLogger() << "GovernmentWnd::MainPanel::SetPolicy specified nonexistant slot";
         return;
     }
@@ -1301,8 +1301,11 @@ int GovernmentWnd::MainPanel::FindEmptySlotForPolicy(const Policy* policy) const
         return -1;
     int empire_id = HumanClientApp::GetApp()->EmpireID();
     const Empire* empire = GetEmpire(empire_id);
-    if (!empire || !empire->PolicyAvailable(policy->Name()))
-        return -1;
+
+    // reject unavailable and already-adopted policies
+    if (!empire || !empire->PolicyAvailable(policy->Name())
+        || empire->PolicyAdopted(policy->Name()))
+    { return -1; }
 
     // scan through slots to find one that can "mount" policy
     for (unsigned int i = 0; i < m_slots.size(); ++i) {
