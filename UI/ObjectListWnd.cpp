@@ -156,8 +156,7 @@ namespace {
                 boost::make_unique<ValueRef::ComplexVariable<T>>(
                     token, std::move(int_ref1), std::move(int_ref2),
                     std::move(int_ref3), std::move(string_ref1), std::move(string_ref2)))
-            )
-    ;
+            );
     }
 
     std::unique_ptr<ValueRef::Variable<std::string>> SystemSupplyRangeValueRef(bool propagated = false) {
@@ -172,6 +171,14 @@ namespace {
             "PropagatedSystemSupplyDistance",
             nullptr,
             boost::make_unique<ValueRef::Variable<int>>(ValueRef::SOURCE_REFERENCE, "SystemID"));
+    }
+
+    std::unique_ptr<ValueRef::Variable<std::string>> DesignCostValueRef() {
+        return StringCastedComplexValueRef<double>(
+            "ShipDesignCost",
+            boost::make_unique<ValueRef::Variable<int>>(ValueRef::SOURCE_REFERENCE, "DesignID"),
+            boost::make_unique<ValueRef::Variable<int>>(ValueRef::SOURCE_REFERENCE, "ProducedByEmpireID"),
+            nullptr);   // TODO: try to get a valid production location for the owner empire?
     }
 
     template <typename T>
@@ -272,6 +279,7 @@ namespace {
             col_types[{UserStringNop("NEAREST_SYSTEM"),             UserStringNop("FLEETS_SUBMENU")}] = ObjectNameValueRef("NearestSystemID");
             col_types[{UserStringNop("HULL"),                       UserStringNop("FLEETS_SUBMENU")}] = UserStringValueRef("Hull");
             col_types[{UserStringNop("PARTS"),                      UserStringNop("FLEETS_SUBMENU")}] = UserStringVecValueRef("Parts");
+            col_types[{UserStringNop("PRODUCTION_COST"),            UserStringNop("FLEETS_SUBMENU")}] = DesignCostValueRef();
 
             for (MeterType meter = MeterType(0); meter <= METER_SPEED;  // the meter(s) after METER_SPEED are part-specific
                  meter = MeterType(meter + 1))
@@ -366,8 +374,8 @@ namespace {
     const std::string STARTYPE_CONDITION(UserStringNop("CONDITION_STARTYPE"));
     const std::string METERVALUE_CONDITION(UserStringNop("CONDITION_METERVALUE"));
     const std::string HASGROWTHSPECIAL_CONDITION(UserStringNop("CONDITION_HAS_GROWTH_SPECIAL"));
-    const std::string GGWITHPTYPE_CONDITION(UserStringNop("CONDITION_PTYPE_W_GG"));
-    const std::string ASTWITHPTYPE_CONDITION(UserStringNop("CONDITION_PTYPE_W_AST"));
+    const std::string GGWITHPTYPE_CONDITION(UserStringNop("CONDITION_PTYPE_W_GG"));     // with gas giant
+    const std::string ASTWITHPTYPE_CONDITION(UserStringNop("CONDITION_PTYPE_W_AST"));   // with asteroids
 
     const std::string FILTER_OPTIONS_WND_NAME = "object-list-filter";
 

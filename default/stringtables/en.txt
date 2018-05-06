@@ -6183,6 +6183,9 @@ Parts
 HULL
 Hull
 
+PRODUCTION_COST
+Production Cost
+
 OBJECT_TYPE
 Type
 
