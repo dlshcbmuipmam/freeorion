@@ -15,6 +15,7 @@ BuildingType
                 Not Contains Building name = "BLD_CONC_CAMP"
             ]
             effects = SetIndustry value = Target.TargetIndustry
+            
         EffectsGroup
             scope = Source
             activation =  ContainedBy AND [
