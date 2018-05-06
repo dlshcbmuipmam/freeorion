@@ -10392,6 +10392,15 @@ Prevents planets from increasing population from turn to turn.
 PLC_NO_GROWTH_SHORT_DESC
 Stops planet growth
 
+PLC_POPULATION
+Population
+
+PLC_POPULATION_DESC
+Increases Growth Rate
+
+PLC_POPULATION_SHORT_DESC
+Increases natural population growth rate by 50%.
+
 PLC_NO_SUPPLY
 No Supply
 
@@ -18884,9 +18893,11 @@ SHIP_NAME_DEVS
 Aquataine
 Big Joe
 Cami
+Dbenage-CX
 Dilvish
 Eleazar
 Geoff the Medio
+LGM-Doyle
 PD
 Tyreth
 Tzlaine

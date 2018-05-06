@@ -84,8 +84,6 @@ FOCUS_CHANGE_PENALTY
             effects = SetStockpile value = Value - max(0, min(1 - Target.TurnsSinceFocusChange, Value - Value(Target.MaxStockpile)))
 '''
 
-//#####      POPULATION GROWTH         #####//
-
 
 //#####      COLONIZATION SPEED        #####//
 
