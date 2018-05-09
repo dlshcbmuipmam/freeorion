@@ -64,7 +64,7 @@ struct ScriptingContext {
         current_value(current_value_)
     {}
 
-    /** For recusrive evaluation of Conditions.  Keeps source and effect_target
+    /** For recursive evaluation of Conditions.  Keeps source and effect_target
       * from input context, but sets local candidate with input object, and if
       * there is no root candidate in the parent context, then the input object
       * becomes the root candidate. */
@@ -89,11 +89,11 @@ struct ScriptingContext {
         current_value(current_value_)
     {}
 
-    std::shared_ptr<const UniverseObject> source;
-    std::shared_ptr<UniverseObject> effect_target;
-    std::shared_ptr<const UniverseObject> condition_root_candidate;
-    std::shared_ptr<const UniverseObject> condition_local_candidate;
-    const boost::any current_value;
+    std::shared_ptr<const UniverseObject>   source;
+    std::shared_ptr<UniverseObject>         effect_target;
+    std::shared_ptr<const UniverseObject>   condition_root_candidate;
+    std::shared_ptr<const UniverseObject>   condition_local_candidate;
+    const boost::any                        current_value;
 };
 
 namespace ValueRef {
