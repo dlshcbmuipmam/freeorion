@@ -424,6 +424,7 @@
     (Shield)                                    \
     (ShipDesign)                                \
     (ShipDesignCost)                            \
+    (ShipDesignNumParts)                        \
     (ShipDesignOrdering)                        \
     (ShipDesignsDestroyed)                      \
     (ShipDesignsLost)                           \
