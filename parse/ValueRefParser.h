@@ -258,11 +258,6 @@ namespace parse {
 
         detail::simple_int_parser_rules         simple_int_rules;
         detail::complex_variable_rule<double>   name_property_rule;
-        detail::complex_variable_rule<double>   empire_meter_value;
-        detail::complex_variable_rule<double>   direct_distance;
-        detail::complex_variable_rule<double>   shortest_path;
-        detail::simple_int_parser_rules         simple_int_rules;
-        detail::complex_variable_rule<double>   name_property_rule;
         detail::complex_variable_rule<double>   id_empire_location_rule;
         detail::complex_variable_rule<double>   empire_meter_value;
         detail::complex_variable_rule<double>   direct_distance;
