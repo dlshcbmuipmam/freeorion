@@ -424,7 +424,6 @@
     (Shield)                                    \
     (ShipDesign)                                \
     (ShipDesignCost)                            \
-    (ShipDesignNumParts)                        \
     (ShipDesignOrdering)                        \
     (ShipDesignsDestroyed)                      \
     (ShipDesignsLost)                           \
@@ -543,6 +542,7 @@
     (Unproducible)                              \
     (Unresearchable)                            \
     (UpgradeVisibility)                         \
+    (UsedInDesignID)                            \
     (UserString)                                \
     (UUID)                                      \
     (Value)                                     \
