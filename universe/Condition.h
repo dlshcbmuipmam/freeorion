@@ -1430,9 +1430,9 @@ private:
 /** Matches all objects whose owner who has the ship design \a id available. */
 struct FO_COMMON_API OwnerHasShipDesignAvailable final : public ConditionBase {
     OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
-                                std::unique_ptr<ValueRef::ValueRefBase<int>>&& id);
-    explicit OwnerHasShipDesignAvailable(int id);
-    explicit OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& id);
+                                std::unique_ptr<ValueRef::ValueRefBase<int>>&& design_id);
+    explicit OwnerHasShipDesignAvailable(int design_id);
+    explicit OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& design_id);
 
     bool            operator==(const ConditionBase& rhs) const override;
     void            Eval(const ScriptingContext& parent_context, ObjectSet& matches,

@@ -7116,22 +7116,22 @@ unsigned int OwnerHasBuildingTypeAvailable::GetCheckSum() const {
 ///////////////////////////////////////////////////////////
 OwnerHasShipDesignAvailable::OwnerHasShipDesignAvailable(
     std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
-    std::unique_ptr<ValueRef::ValueRefBase<int>>&& id) :
+    std::unique_ptr<ValueRef::ValueRefBase<int>>&& design_id) :
     ConditionBase(),
-    m_id(std::move(id)),
+    m_id(std::move(design_id)),
     m_empire_id(std::move(empire_id))
 {}
 
-OwnerHasShipDesignAvailable::OwnerHasShipDesignAvailable(int id) :
+OwnerHasShipDesignAvailable::OwnerHasShipDesignAvailable(int design_id) :
     ConditionBase(),
     // TODO: Use std::make_unique when adopting C++14
-    m_id(new ValueRef::Constant<int>(id)),
+    m_id(new ValueRef::Constant<int>(design_id)),
     m_empire_id(nullptr)
 {}
 
-OwnerHasShipDesignAvailable::OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& id) :
+OwnerHasShipDesignAvailable::OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& design_id) :
     ConditionBase(),
-    m_id(std::move(id)),
+    m_id(std::move(design_id)),
     m_empire_id(nullptr)
 {}
 
