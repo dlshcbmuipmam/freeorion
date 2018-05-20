@@ -1364,8 +1364,8 @@ struct FO_COMMON_API EmpireHasAdoptedPolicy final : public ConditionBase {
 private:
     bool Match(const ScriptingContext& local_context) const override;
 
-    std::unique_ptr<ValueRef::ValueRefBase<std::string>>    m_name;
-    std::unique_ptr<ValueRef::ValueRefBase<int>>            m_empire_id;
+    std::unique_ptr<ValueRef::ValueRefBase<std::string>> m_name;
+    std::unique_ptr<ValueRef::ValueRefBase<int>>         m_empire_id;
 
     friend class boost::serialization::access;
     template <class Archive>
@@ -1374,21 +1374,24 @@ private:
 
 /** Matches all objects whose owner who has tech \a name. */
 struct FO_COMMON_API OwnerHasTech final : public ConditionBase {
+    OwnerHasTech(std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
+                 std::unique_ptr<ValueRef::ValueRefBase<std::string>>&& name);
     explicit OwnerHasTech(std::unique_ptr<ValueRef::ValueRefBase<std::string>>&& name);
-    bool operator==(const ConditionBase& rhs) const override;
-    void Eval(const ScriptingContext& parent_context, ObjectSet& matches,
-              ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
-    bool RootCandidateInvariant() const override;
-    bool TargetInvariant() const override;
-    bool SourceInvariant() const override;
-    std::string Description(bool negated = false) const override;
-    std::string Dump(unsigned short ntabs = 0) const override;
-    void SetTopLevelContent(const std::string& content_name) override;
-    unsigned int GetCheckSum() const override;
+    bool            operator==(const ConditionBase& rhs) const override;
+    void            Eval(const ScriptingContext& parent_context, ObjectSet& matches,
+                         ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
+    bool            RootCandidateInvariant() const override;
+    bool            TargetInvariant() const override;
+    bool            SourceInvariant() const override;
+    std::string     Description(bool negated = false) const override;
+    std::string     Dump(unsigned short ntabs = 0) const override;
+    void            SetTopLevelContent(const std::string& content_name) override;
+    unsigned int    GetCheckSum() const override;
 private:
     bool Match(const ScriptingContext& local_context) const override;
 
     std::unique_ptr<ValueRef::ValueRefBase<std::string>> m_name;
+    std::unique_ptr<ValueRef::ValueRefBase<int>>         m_empire_id;
 
     friend class boost::serialization::access;
     template <class Archive>
@@ -1397,24 +1400,27 @@ private:
 
 /** Matches all objects whose owner who has the building type \a name available. */
 struct FO_COMMON_API OwnerHasBuildingTypeAvailable final : public ConditionBase {
+    OwnerHasBuildingTypeAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
+                                  std::unique_ptr<ValueRef::ValueRefBase<std::string>>&& name);
     explicit OwnerHasBuildingTypeAvailable(const std::string& name);
     explicit OwnerHasBuildingTypeAvailable(std::unique_ptr<ValueRef::ValueRefBase<std::string>>&& name);
 
-    bool operator==(const ConditionBase& rhs) const override;
-    void Eval(const ScriptingContext& parent_context, ObjectSet& matches,
-              ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
-    bool RootCandidateInvariant() const override;
-    bool TargetInvariant() const override;
-    bool SourceInvariant() const override;
-    std::string Description(bool negated = false) const override;
-    std::string Dump(unsigned short ntabs = 0) const override;
-    void SetTopLevelContent(const std::string& content_name) override;
-    unsigned int GetCheckSum() const override;
+    bool            operator==(const ConditionBase& rhs) const override;
+    void            Eval(const ScriptingContext& parent_context, ObjectSet& matches,
+                         ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
+    bool            RootCandidateInvariant() const override;
+    bool            TargetInvariant() const override;
+    bool            SourceInvariant() const override;
+    std::string     Description(bool negated = false) const override;
+    std::string     Dump(unsigned short ntabs = 0) const override;
+    void            SetTopLevelContent(const std::string& content_name) override;
+    unsigned int    GetCheckSum() const override;
 
 private:
     bool Match(const ScriptingContext& local_context) const override;
 
     std::unique_ptr<ValueRef::ValueRefBase<std::string>> m_name;
+    std::unique_ptr<ValueRef::ValueRefBase<int>>         m_empire_id;
 
     friend class boost::serialization::access;
     template <class Archive>
@@ -1423,24 +1429,27 @@ private:
 
 /** Matches all objects whose owner who has the ship design \a id available. */
 struct FO_COMMON_API OwnerHasShipDesignAvailable final : public ConditionBase {
+    OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
+                                std::unique_ptr<ValueRef::ValueRefBase<int>>&& id);
     explicit OwnerHasShipDesignAvailable(int id);
     explicit OwnerHasShipDesignAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& id);
 
-    bool operator==(const ConditionBase& rhs) const override;
-    void Eval(const ScriptingContext& parent_context, ObjectSet& matches,
-              ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
-    bool RootCandidateInvariant() const override;
-    bool TargetInvariant() const override;
-    bool SourceInvariant() const override;
-    std::string Description(bool negated = false) const override;
-    std::string Dump(unsigned short ntabs = 0) const override;
-    void SetTopLevelContent(const std::string& content_name) override;
-    unsigned int GetCheckSum() const override;
+    bool            operator==(const ConditionBase& rhs) const override;
+    void            Eval(const ScriptingContext& parent_context, ObjectSet& matches,
+                         ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
+    bool            RootCandidateInvariant() const override;
+    bool            TargetInvariant() const override;
+    bool            SourceInvariant() const override;
+    std::string     Description(bool negated = false) const override;
+    std::string     Dump(unsigned short ntabs = 0) const override;
+    void            SetTopLevelContent(const std::string& content_name) override;
+    unsigned int    GetCheckSum() const override;
 
 private:
     bool Match(const ScriptingContext& local_context) const override;
 
     std::unique_ptr<ValueRef::ValueRefBase<int>> m_id;
+    std::unique_ptr<ValueRef::ValueRefBase<int>> m_empire_id;
 
     friend class boost::serialization::access;
     template <class Archive>
@@ -1449,24 +1458,27 @@ private:
 
 /** Matches all objects whose owner who has the ship part @a name available. */
 struct FO_COMMON_API OwnerHasShipPartAvailable final : public ConditionBase {
+    OwnerHasShipPartAvailable(std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
+                              std::unique_ptr<ValueRef::ValueRefBase<std::string>>&& name);
     explicit OwnerHasShipPartAvailable(const std::string& name);
     explicit OwnerHasShipPartAvailable(std::unique_ptr<ValueRef::ValueRefBase<std::string>>&& name);
 
-    bool operator==(const ConditionBase& rhs) const override;
-    void Eval(const ScriptingContext& parent_context, ObjectSet& matches,
-              ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
-    bool RootCandidateInvariant() const override;
-    bool TargetInvariant() const override;
-    bool SourceInvariant() const override;
-    std::string Description(bool negated = false) const override;
-    std::string Dump(unsigned short ntabs = 0) const override;
-    void SetTopLevelContent(const std::string& content_name) override;
-    unsigned int GetCheckSum() const override;
+    bool            operator==(const ConditionBase& rhs) const override;
+    void            Eval(const ScriptingContext& parent_context, ObjectSet& matches,
+                         ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
+    bool            RootCandidateInvariant() const override;
+    bool            TargetInvariant() const override;
+    bool            SourceInvariant() const override;
+    std::string     Description(bool negated = false) const override;
+    std::string     Dump(unsigned short ntabs = 0) const override;
+    void            SetTopLevelContent(const std::string& content_name) override;
+    unsigned int    GetCheckSum() const override;
 
 private:
     bool Match(const ScriptingContext& local_context) const override;
 
     std::unique_ptr<ValueRef::ValueRefBase<std::string>> m_name;
+    std::unique_ptr<ValueRef::ValueRefBase<int>>         m_empire_id;
 
     friend class boost::serialization::access;
     template <class Archive>
@@ -2283,21 +2295,24 @@ template <class Archive>
 void OwnerHasTech::serialize(Archive& ar, const unsigned int version)
 {
     ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase)
-        & BOOST_SERIALIZATION_NVP(m_name);
+        & BOOST_SERIALIZATION_NVP(m_name)
+        & BOOST_SERIALIZATION_NVP(m_empire_id);
 }
 
 template <class Archive>
 void OwnerHasBuildingTypeAvailable::serialize(Archive& ar, const unsigned int version)
 {
     ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase)
-        & BOOST_SERIALIZATION_NVP(m_name);
+        & BOOST_SERIALIZATION_NVP(m_name)
+        & BOOST_SERIALIZATION_NVP(m_empire_id);
 }
 
 template <class Archive>
 void OwnerHasShipDesignAvailable::serialize(Archive& ar, const unsigned int version)
 {
     ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase)
-        & BOOST_SERIALIZATION_NVP(m_id);
+        & BOOST_SERIALIZATION_NVP(m_id)
+        & BOOST_SERIALIZATION_NVP(m_empire_id);
 }
 
 template <class Archive>
@@ -2305,7 +2320,8 @@ void OwnerHasShipPartAvailable::serialize(Archive& ar,
                                           const unsigned int version)
 {
     ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase)
-        & BOOST_SERIALIZATION_NVP(m_name);
+        & BOOST_SERIALIZATION_NVP(m_name)
+        & BOOST_SERIALIZATION_NVP(m_empire_id);
 }
 
 template <class Archive>
