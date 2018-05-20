@@ -6585,7 +6585,13 @@ std::string EmpireStockpileValue::Dump(unsigned short ntabs) const {
     case RE_INDUSTRY:   retval += "OwnerIndustryStockpile"; break;
     default: retval += "?"; break;
     }
-    retval += " low = " + m_low->Dump(ntabs) + " high = " + m_high->Dump(ntabs) + "\n";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
+    if (m_low)
+        retval += " low = " + m_low->Dump(ntabs);
+    if (m_high)
+        retval += " high = " + m_high->Dump(ntabs);
+    retval += "\n";
     return retval;
 }
 
@@ -6602,6 +6608,8 @@ bool EmpireStockpileValue::Match(const ScriptingContext& local_context) const {
 }
 
 void EmpireStockpileValue::SetTopLevelContent(const std::string& content_name) {
+    if (m_empire_id)
+        m_empire_id->SetTopLevelContent(content_name);
     if (m_low)
         m_low->SetTopLevelContent(content_name);
     if (m_high)
@@ -6612,6 +6620,7 @@ unsigned int EmpireStockpileValue::GetCheckSum() const {
     unsigned int retval{0};
 
     CheckSums::CheckSumCombine(retval, "Condition::EmpireStockpileValue");
+    CheckSums::CheckSumCombine(retval, m_empire_id);
     CheckSums::CheckSumCombine(retval, m_stockpile);
     CheckSums::CheckSumCombine(retval, m_low);
     CheckSums::CheckSumCombine(retval, m_high);
@@ -6731,6 +6740,8 @@ std::string EmpireHasAdoptedPolicy::Description(bool negated/* = false*/) const 
 
 std::string EmpireHasAdoptedPolicy::Dump(unsigned short ntabs) const {
     std::string retval = DumpIndent(ntabs) + "EmpireHasAdoptedPolicy";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
     if (m_name)
         retval += " name = " + m_name->Dump(ntabs);
     retval += "\n";
@@ -6751,6 +6762,8 @@ bool EmpireHasAdoptedPolicy::Match(const ScriptingContext& local_context) const 
 }
 
 void EmpireHasAdoptedPolicy::SetTopLevelContent(const std::string& content_name) {
+    if (m_empire_id)
+        m_empire_id->SetTopLevelContent(content_name);
     if (m_name)
         m_name->SetTopLevelContent(content_name);
 }
@@ -6759,6 +6772,7 @@ unsigned int EmpireHasAdoptedPolicy::GetCheckSum() const {
     unsigned int retval{0};
 
     CheckSums::CheckSumCombine(retval, "Condition::EmpireHasAdoptedPolicy");
+    CheckSums::CheckSumCombine(retval, m_empire_id);
     CheckSums::CheckSumCombine(retval, m_name);
 
     TraceLogger() << "GetCheckSum(EmpireHasAdoptedPolicy): retval: " << retval;
@@ -6788,6 +6802,9 @@ bool OwnerHasTech::operator==(const ConditionBase& rhs) const {
         return false;
 
     const OwnerHasTech& rhs_ = static_cast<const OwnerHasTech&>(rhs);
+
+    if (m_empire_id != rhs_.m_empire_id)
+        return false;
 
     CHECK_COND_VREF_MEMBER(m_name)
 
@@ -6835,14 +6852,20 @@ void OwnerHasTech::Eval(const ScriptingContext& parent_context,
     }
 }
 
-bool OwnerHasTech::RootCandidateInvariant() const
-{ return !m_name || m_name->RootCandidateInvariant(); }
+bool OwnerHasTech::RootCandidateInvariant() const {
+    return (!m_empire_id || m_empire_id->RootCandidateInvariant()) &&
+           (!m_name || m_name->RootCandidateInvariant());
+}
 
-bool OwnerHasTech::TargetInvariant() const
-{ return !m_name || m_name->TargetInvariant(); }
+bool OwnerHasTech::TargetInvariant() const {
+    return (!m_empire_id || m_empire_id->TargetInvariant()) &&
+           (!m_name || m_name->TargetInvariant());
+}
 
-bool OwnerHasTech::SourceInvariant() const
-{ return !m_name || m_name->SourceInvariant(); }
+bool OwnerHasTech::SourceInvariant() const {
+    return (!m_empire_id || m_empire_id->SourceInvariant()) &&
+           (!m_name || m_name->SourceInvariant());
+}
 
 std::string OwnerHasTech::Description(bool negated/* = false*/) const {
     std::string name_str;
@@ -6859,6 +6882,8 @@ std::string OwnerHasTech::Description(bool negated/* = false*/) const {
 
 std::string OwnerHasTech::Dump(unsigned short ntabs) const {
     std::string retval = DumpIndent(ntabs) + "OwnerHasTech";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
     if (m_name)
         retval += " name = " + m_name->Dump(ntabs);
     retval += "\n";
@@ -6877,6 +6902,8 @@ bool OwnerHasTech::Match(const ScriptingContext& local_context) const {
 }
 
 void OwnerHasTech::SetTopLevelContent(const std::string& content_name) {
+    if (m_empire_id)
+        m_empire_id->SetTopLevelContent(content_name);
     if (m_name)
         m_name->SetTopLevelContent(content_name);
 }
@@ -6885,6 +6912,7 @@ unsigned int OwnerHasTech::GetCheckSum() const {
     unsigned int retval{0};
 
     CheckSums::CheckSumCombine(retval, "Condition::OwnerHasTech");
+    CheckSums::CheckSumCombine(retval, m_empire_id);
     CheckSums::CheckSumCombine(retval, m_name);
 
     TraceLogger() << "GetCheckSum(OwnerHasTech): retval: " << retval;
@@ -6922,6 +6950,9 @@ bool OwnerHasBuildingTypeAvailable::operator==(const ConditionBase& rhs) const {
         return false;
 
     const OwnerHasBuildingTypeAvailable& rhs_ = static_cast<const OwnerHasBuildingTypeAvailable&>(rhs);
+
+    if (m_empire_id != rhs_.m_empire_id)
+        return false;
 
     CHECK_COND_VREF_MEMBER(m_name)
 
@@ -6969,14 +7000,20 @@ void OwnerHasBuildingTypeAvailable::Eval(const ScriptingContext& parent_context,
     }
 }
 
-bool OwnerHasBuildingTypeAvailable::RootCandidateInvariant() const
-{ return !m_name || m_name->RootCandidateInvariant(); }
+bool OwnerHasBuildingTypeAvailable::RootCandidateInvariant() const {
+    return (!m_empire_id || m_empire_id->RootCandidateInvariant()) &&
+           (!m_name || m_name->RootCandidateInvariant());
+}
 
-bool OwnerHasBuildingTypeAvailable::TargetInvariant() const
-{ return !m_name || m_name->TargetInvariant(); }
+bool OwnerHasBuildingTypeAvailable::TargetInvariant() const {
+    return (!m_empire_id || m_empire_id->TargetInvariant()) &&
+           (!m_name || m_name->TargetInvariant());
+}
 
-bool OwnerHasBuildingTypeAvailable::SourceInvariant() const
-{ return !m_name || m_name->SourceInvariant(); }
+bool OwnerHasBuildingTypeAvailable::SourceInvariant() const {
+    return (!m_empire_id || m_empire_id->SourceInvariant()) &&
+           (!m_name || m_name->SourceInvariant());
+}
 
 std::string OwnerHasBuildingTypeAvailable::Description(bool negated/* = false*/) const {
     // used internally for a tooltip where context is apparent, so don't need
@@ -6988,6 +7025,8 @@ std::string OwnerHasBuildingTypeAvailable::Description(bool negated/* = false*/)
 
 std::string OwnerHasBuildingTypeAvailable::Dump(unsigned short ntabs) const {
     std::string retval= DumpIndent(ntabs) + "OwnerHasBuildingTypeAvailable";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
     if (m_name)
         retval += " name = " + m_name->Dump(ntabs);
     retval += "\n";
@@ -7006,6 +7045,8 @@ bool OwnerHasBuildingTypeAvailable::Match(const ScriptingContext& local_context)
 }
 
 void OwnerHasBuildingTypeAvailable::SetTopLevelContent(const std::string& content_name) {
+    if (m_empire_id)
+        m_empire_id->SetTopLevelContent(content_name);
     if (m_name)
         m_name->SetTopLevelContent(content_name);
 }
@@ -7014,6 +7055,7 @@ unsigned int OwnerHasBuildingTypeAvailable::GetCheckSum() const {
     unsigned int retval{0};
 
     CheckSums::CheckSumCombine(retval, "Condition::OwnerHasBuildingTypeAvailable");
+    CheckSums::CheckSumCombine(retval, m_empire_id);
     CheckSums::CheckSumCombine(retval, m_name);
 
     TraceLogger() << "GetCheckSum(OwnerHasBuildingTypeAvailable): retval: " << retval;
@@ -7051,6 +7093,9 @@ bool OwnerHasShipDesignAvailable::operator==(const ConditionBase& rhs) const {
         return false;
 
     const OwnerHasShipDesignAvailable& rhs_ = static_cast<const OwnerHasShipDesignAvailable&>(rhs);
+
+    if (m_empire_id != rhs_.m_empire_id)
+        return false;
 
     CHECK_COND_VREF_MEMBER(m_id)
 
@@ -7098,14 +7143,20 @@ void OwnerHasShipDesignAvailable::Eval(const ScriptingContext& parent_context,
     }
 }
 
-bool OwnerHasShipDesignAvailable::RootCandidateInvariant() const
-{ return !m_id || m_id->RootCandidateInvariant(); }
+bool OwnerHasShipDesignAvailable::RootCandidateInvariant() const {
+    return (!m_empire_id || m_empire_id->RootCandidateInvariant()) &&
+           (!m_id || m_id->RootCandidateInvariant());
+}
 
-bool OwnerHasShipDesignAvailable::TargetInvariant() const
-{ return !m_id || m_id->TargetInvariant(); }
+bool OwnerHasShipDesignAvailable::TargetInvariant() const {
+    return (!m_empire_id || m_empire_id->TargetInvariant()) &&
+           (!m_id || m_id->TargetInvariant());
+}
 
-bool OwnerHasShipDesignAvailable::SourceInvariant() const
-{ return !m_id || m_id->SourceInvariant(); }
+bool OwnerHasShipDesignAvailable::SourceInvariant() const {
+    return (!m_empire_id || m_empire_id->SourceInvariant()) &&
+           (!m_id || m_id->SourceInvariant());
+}
 
 std::string OwnerHasShipDesignAvailable::Description(bool negated/* = false*/) const {
     // used internally for a tooltip where context is apparent, so don't need
@@ -7117,6 +7168,8 @@ std::string OwnerHasShipDesignAvailable::Description(bool negated/* = false*/) c
 
 std::string OwnerHasShipDesignAvailable::Dump(unsigned short ntabs) const {
     std::string retval = DumpIndent(ntabs) + "OwnerHasShipDesignAvailable";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
     if (m_id)
         retval += " id = " + m_id->Dump(ntabs);
     retval += "\n";
@@ -7135,6 +7188,8 @@ bool OwnerHasShipDesignAvailable::Match(const ScriptingContext& local_context) c
 }
 
 void OwnerHasShipDesignAvailable::SetTopLevelContent(const std::string& content_name) {
+    if (m_empire_id)
+        m_empire_id->SetTopLevelContent(content_name);
     if (m_id)
         m_id->SetTopLevelContent(content_name);
 }
@@ -7143,6 +7198,7 @@ unsigned int OwnerHasShipDesignAvailable::GetCheckSum() const {
     unsigned int retval{0};
 
     CheckSums::CheckSumCombine(retval, "Condition::OwnerHasShipDesignAvailable");
+    CheckSums::CheckSumCombine(retval, m_empire_id);
     CheckSums::CheckSumCombine(retval, m_id);
 
     TraceLogger() << "GetCheckSum(OwnerHasShipDesignAvailable): retval: " << retval;
@@ -7181,6 +7237,9 @@ bool OwnerHasShipPartAvailable::operator==(const ConditionBase& rhs) const {
 
     const OwnerHasShipPartAvailable& rhs_ =
         static_cast<const OwnerHasShipPartAvailable&>(rhs);
+
+    if (m_empire_id != rhs_.m_empire_id)
+        return false;
 
     CHECK_COND_VREF_MEMBER(m_name)
 
@@ -7230,14 +7289,20 @@ void OwnerHasShipPartAvailable::Eval(const ScriptingContext& parent_context,
     }
 }
 
-bool OwnerHasShipPartAvailable::RootCandidateInvariant() const
-{ return !m_name || m_name->RootCandidateInvariant(); }
+bool OwnerHasShipPartAvailable::RootCandidateInvariant() const {
+    return (!m_empire_id || m_empire_id->RootCandidateInvariant()) &&
+           (!m_name || m_name->RootCandidateInvariant());
+}
 
-bool OwnerHasShipPartAvailable::TargetInvariant() const
-{ return !m_name || m_name->TargetInvariant(); }
+bool OwnerHasShipPartAvailable::TargetInvariant() const {
+    return (!m_empire_id || m_empire_id->TargetInvariant()) &&
+           (!m_name || m_name->TargetInvariant());
+}
 
-bool OwnerHasShipPartAvailable::SourceInvariant() const
-{ return !m_name || m_name->SourceInvariant(); }
+bool OwnerHasShipPartAvailable::SourceInvariant() const {
+    return (!m_empire_id || m_empire_id->TargetInvariant()) &&
+           (!m_name || m_name->TargetInvariant());
+}
 
 std::string OwnerHasShipPartAvailable::Description(bool negated/* = false*/) const {
     return (!negated)
@@ -7247,6 +7312,8 @@ std::string OwnerHasShipPartAvailable::Description(bool negated/* = false*/) con
 
 std::string OwnerHasShipPartAvailable::Dump(unsigned short ntabs) const {
     std::string retval = DumpIndent(ntabs) + "OwnerHasShipPartAvailable";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
     if (m_name)
         retval += " name = " + m_name->Dump(ntabs);
     retval += "\n";
@@ -7265,6 +7332,8 @@ bool OwnerHasShipPartAvailable::Match(const ScriptingContext& local_context) con
 }
 
 void OwnerHasShipPartAvailable::SetTopLevelContent(const std::string& content_name) {
+    if (m_empire_id)
+        m_empire_id->SetTopLevelContent(content_name);
     if (m_name)
         m_name->SetTopLevelContent(content_name);
 }
@@ -7273,6 +7342,7 @@ unsigned int OwnerHasShipPartAvailable::GetCheckSum() const {
     unsigned int retval{0};
 
     CheckSums::CheckSumCombine(retval, "Condition::OwnerHasShipPartAvailable");
+    CheckSums::CheckSumCombine(retval, m_empire_id);
     CheckSums::CheckSumCombine(retval, m_name);
 
     TraceLogger() << "GetCheckSum(OwnerHasShipPartAvailable): retval: " << retval;
@@ -7335,13 +7405,13 @@ void VisibleToEmpire::Eval(const ScriptingContext& parent_context,
 }
 
 bool VisibleToEmpire::RootCandidateInvariant() const
-{ return m_empire_id->RootCandidateInvariant(); }
+{ return !m_empire_id || m_empire_id->RootCandidateInvariant(); }
 
 bool VisibleToEmpire::TargetInvariant() const
-{ return m_empire_id->TargetInvariant(); }
+{ return !m_empire_id || m_empire_id->TargetInvariant(); }
 
 bool VisibleToEmpire::SourceInvariant() const
-{ return m_empire_id->SourceInvariant(); }
+{ return !m_empire_id || m_empire_id->SourceInvariant(); }
 
 std::string VisibleToEmpire::Description(bool negated/* = false*/) const {
     std::string empire_str;
@@ -7361,8 +7431,13 @@ std::string VisibleToEmpire::Description(bool negated/* = false*/) const {
                % empire_str);
 }
 
-std::string VisibleToEmpire::Dump(unsigned short ntabs) const
-{ return DumpIndent(ntabs) + "VisibleToEmpire empire_id = " + m_empire_id->Dump(ntabs) + "\n"; }
+std::string VisibleToEmpire::Dump(unsigned short ntabs) const {
+    std::string retval = DumpIndent(ntabs) + "VisibleToEmpire";
+    if (m_empire_id)
+        retval += " empire = " + m_empire_id->Dump(ntabs);
+    retval += "\n";
+    return retval;
+}
 
 bool VisibleToEmpire::Match(const ScriptingContext& local_context) const {
     auto candidate = local_context.condition_local_candidate;
