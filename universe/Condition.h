@@ -1310,22 +1310,26 @@ struct FO_COMMON_API EmpireStockpileValue final : public ConditionBase {
     EmpireStockpileValue(ResourceType stockpile,
                          std::unique_ptr<ValueRef::ValueRefBase<double>>&& low,
                          std::unique_ptr<ValueRef::ValueRefBase<double>>&& high);
-
-    bool operator==(const ConditionBase& rhs) const override;
-    void Eval(const ScriptingContext& parent_context, ObjectSet& matches,
-              ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
-    bool RootCandidateInvariant() const override;
-    bool TargetInvariant() const override;
-    bool SourceInvariant() const override;
-    std::string Description(bool negated = false) const override;
-    std::string Dump(unsigned short ntabs = 0) const override;
-    void SetTopLevelContent(const std::string& content_name) override;
-    unsigned int GetCheckSum() const override;
+    EmpireStockpileValue(std::unique_ptr<ValueRef::ValueRefBase<int>>&& empire_id,
+                         ResourceType stockpile,
+                         std::unique_ptr<ValueRef::ValueRefBase<double>>&& low,
+                         std::unique_ptr<ValueRef::ValueRefBase<double>>&& high);
+    bool            operator==(const ConditionBase& rhs) const override;
+    void            Eval(const ScriptingContext& parent_context, ObjectSet& matches,
+                         ObjectSet& non_matches, SearchDomain search_domain = NON_MATCHES) const override;
+    bool            RootCandidateInvariant() const override;
+    bool            TargetInvariant() const override;
+    bool            SourceInvariant() const override;
+    std::string     Description(bool negated = false) const override;
+    std::string     Dump(unsigned short ntabs = 0) const override;
+    void            SetTopLevelContent(const std::string& content_name) override;
+    unsigned int    GetCheckSum() const override;
 
 private:
-    bool Match(const ScriptingContext& local_context) const override;
+    bool            Match(const ScriptingContext& local_context) const override;
 
-    ResourceType m_stockpile;
+    std::unique_ptr<ValueRef::ValueRefBase<int>>    m_empire_id;
+    ResourceType                                    m_stockpile;
     std::unique_ptr<ValueRef::ValueRefBase<double>> m_low;
     std::unique_ptr<ValueRef::ValueRefBase<double>> m_high;
 
@@ -1355,8 +1359,8 @@ struct FO_COMMON_API EmpireHasAdoptedPolicy final : public ConditionBase {
     std::string Dump(unsigned short ntabs = 0) const override;
 
     void SetTopLevelContent(const std::string& content_name) override;
-
     unsigned int GetCheckSum() const override;
+
 private:
     bool Match(const ScriptingContext& local_context) const override;
 
@@ -2261,8 +2265,18 @@ template <class Archive>
 void EmpireStockpileValue::serialize(Archive& ar, const unsigned int version)
 {
     ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase)
+        & BOOST_SERIALIZATION_NVP(m_empire_id)
+        & BOOST_SERIALIZATION_NVP(m_stockpile)
         & BOOST_SERIALIZATION_NVP(m_low)
         & BOOST_SERIALIZATION_NVP(m_high);
+}
+
+template <class Archive>
+void EmpireHasAdoptedPolicy::serialize(Archive& ar, const unsigned int version)
+{
+    ar  & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ConditionBase)
+        & BOOST_SERIALIZATION_NVP(m_name)
+        & BOOST_SERIALIZATION_NVP(m_empire_id);
 }
 
 template <class Archive>
