@@ -974,43 +974,7 @@ MapWnd::MapWnd() :
             static_cast<GG::X>(GetUniverse().UniverseWidth() * ZOOM_MAX + AppWidth() * 1.5),
             static_cast<GG::Y>(GetUniverse().UniverseWidth() * ZOOM_MAX + AppHeight() * 1.5),
             GG::INTERACTIVE | GG::DRAGABLE),
-    m_selected_fleet_ids(),
-    m_selected_ship_ids(),
-    m_system_icons(),
-    m_wnd_stack(),
-    m_starlane_endpoints(),
-    m_stationary_fleet_buttons(),
-    m_departing_fleet_buttons(),
-    m_moving_fleet_buttons(),
-    m_offroad_fleet_buttons(),
-    m_fleet_buttons(),
-    m_fleet_state_change_signals(),
-    m_system_fleet_insert_remove_signals(),
-    m_fleet_lines(),
-    m_projected_fleet_lines(),
     m_line_between_systems{INVALID_OBJECT_ID, INVALID_OBJECT_ID},
-    m_star_core_quad_vertices(),
-    m_star_halo_quad_vertices(),
-    m_galaxy_gas_quad_vertices(),
-    m_galaxy_gas_texture_coords(),
-    m_star_texture_coords(),
-    m_star_circle_vertices(),
-    m_starlane_vertices(),
-    m_starlane_colors(),
-    m_RC_starlane_vertices(),
-    m_RC_starlane_colors(),
-    m_field_vertices(),
-    m_field_scanline_circles(),
-    m_field_texture_coords(),
-    m_visibility_radii_vertices(),
-    m_visibility_radii_colors(),
-    m_visibility_radii_border_vertices(),
-    m_visibility_radii_border_colors(),
-    m_radii_radii_vertices_indices_runs(),
-    m_scale_circle_vertices(),
-    m_starfield_verts(),
-    m_starfield_colours(),
-    m_popups(),
     m_current_owned_system(INVALID_OBJECT_ID),
     m_current_fleet_id(INVALID_OBJECT_ID)
 {}
@@ -1041,8 +1005,8 @@ void MapWnd::CompleteConstruction() {
 
     // turn button
     // determine size from the text that will go into the button, using a test year string
-    std::string turn_button_longest_reasonable_text =  boost::io::str(FlexibleFormat(UserString("MAP_BTN_TURN_UPDATE")) % "99999"); // it is unlikely a game will go over 100000 turns
-    std::string unready_button_longest_reasonable_text =  boost::io::str(FlexibleFormat(UserString("MAP_BTN_TURN_UNREADY")) % "99999");
+    std::string turn_button_longest_reasonable_text = boost::io::str(FlexibleFormat(UserString("MAP_BTN_TURN_UPDATE")) % "99999"); // it is unlikely a game will go over 100000 turns
+    std::string unready_button_longest_reasonable_text = boost::io::str(FlexibleFormat(UserString("MAP_BTN_TURN_UNREADY")) % "99999");
     m_btn_turn = Wnd::Create<CUIButton>(turn_button_longest_reasonable_text.size() > unready_button_longest_reasonable_text.size() ?
                                         turn_button_longest_reasonable_text :
                                         unready_button_longest_reasonable_text);
@@ -1389,6 +1353,10 @@ void MapWnd::CompleteConstruction() {
 
     layout->SetColumnStretch(layout_column, 1.0);
     layout->Add(m_research,         0, layout_column, GG::ALIGN_LEFT | GG::ALIGN_VCENTER);
+    ++layout_column;
+
+    layout->SetColumnStretch(layout_column, 1.0);
+    layout->Add(m_influence,        0, layout_column, GG::ALIGN_LEFT | GG::ALIGN_VCENTER);
     ++layout_column;
 
     layout->SetColumnStretch(layout_column, 1.0);
