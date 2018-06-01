@@ -5946,7 +5946,7 @@ namespace {
         case METER_TARGET_POPULATION:   return "TargetPopulation";   break;
         case METER_TARGET_INDUSTRY:     return "TargetIndustry";     break;
         case METER_TARGET_RESEARCH:     return "TargetResearch";     break;
-        case METER_TARGET_TRADE:        return "TargetTrade";        break;
+        case METER_TARGET_INFLUENCE:    return "TargetInfluence";    break;
         case METER_TARGET_CONSTRUCTION: return "TargetConstruction"; break;
         case METER_MAX_FUEL:            return "MaxFuel";            break;
         case METER_MAX_SHIELD:          return "MaxShield";          break;
@@ -5958,7 +5958,7 @@ namespace {
         case METER_POPULATION:          return "Population";         break;
         case METER_INDUSTRY:            return "Industry";           break;
         case METER_RESEARCH:            return "Research";           break;
-        case METER_TRADE:               return "Trade";              break;
+        case METER_INFLUENCE:           return "Influence";          break;
         case METER_CONSTRUCTION:        return "Construction";       break;
         case METER_FUEL:                return "Fuel";               break;
         case METER_SHIELD:              return "Shield";             break;
@@ -6590,7 +6590,7 @@ std::string EmpireStockpileValue::Description(bool negated/* = false*/) const {
 std::string EmpireStockpileValue::Dump(unsigned short ntabs) const {
     std::string retval = DumpIndent(ntabs);
     switch (m_stockpile) {
-    case RE_TRADE:      retval += "OwnerTradeStockpile";    break;
+    case RE_INFLUENCE:  retval += "OwnerInfluenceStockpile";    break;
     case RE_RESEARCH:   retval += "OwnerResearchStockpile"; break;
     case RE_INDUSTRY:   retval += "OwnerIndustryStockpile"; break;
     default:            retval += "?";                      break;
