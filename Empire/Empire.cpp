@@ -54,7 +54,8 @@ Empire::PolicyAdoptionInfo::PolicyAdoptionInfo(int turn, const std::string& cat,
 ////////////
 Empire::Empire() :
     m_research_queue(m_id),
-    m_production_queue(m_id)
+    m_production_queue(m_id),
+    m_influence_queue(m_id)
 { Init(); }
 
 Empire::Empire(const std::string& name, const std::string& player_name,
@@ -64,7 +65,8 @@ Empire::Empire(const std::string& name, const std::string& player_name,
     m_player_name(player_name),
     m_color(color),
     m_research_queue(m_id),
-    m_production_queue(m_id)
+    m_production_queue(m_id),
+    m_influence_queue(m_id)
 {
     DebugLogger() << "Empire::Empire(" << name << ", " << player_name << ", " << empire_id << ", colour)";
     Init();
@@ -2316,8 +2318,9 @@ void Empire::CheckProductionProgress() {
     SetResourceStockpile(RE_INDUSTRY, m_production_queue.ExpectedNewStockpileAmount());
 }
 
-void Empire::CheckInfluenceProgress()
-{ m_resource_pools[RE_INFLUENCE]->SetStockpile(m_resource_pools[RE_INFLUENCE]->TotalAvailable()); }
+void Empire::CheckInfluenceProgress() {
+    m_resource_pools[RE_INFLUENCE]->SetStockpile(m_resource_pools[RE_INFLUENCE]->TotalAvailable());
+}
 
 void Empire::SetColor(const GG::Clr& color)
 { m_color = color; }
