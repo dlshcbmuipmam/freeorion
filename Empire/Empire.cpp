@@ -237,7 +237,6 @@ void Empire::AdoptPolicy(const std::string& name, const std::string& category,
     }
     // convert to vector;
     std::vector<std::string> adopted_policies_in_category;
-    int max_idx = -1;
 
     // if no particular slot was specified, try to find a suitable slot in category
     if (slot == INVALID_SLOT_INDEX) {

@@ -531,7 +531,6 @@ void HumanClientApp::NewSinglePlayerGame(bool quickstart) {
     }
 
     if (quickstart || ended_with_ok) {
-
         SinglePlayerSetupData setup_data;
         setup_data.m_new_game = true;
         setup_data.m_filename.clear();  // not used for new game
