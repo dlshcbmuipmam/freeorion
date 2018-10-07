@@ -160,23 +160,31 @@ void Empire::serialize(Archive& ar, const unsigned int version)
             m_techs[entry] = BEFORE_FIRST_TURN;
 
     } else {
-        ar  & BOOST_SERIALIZATION_NVP(m_techs)
-            & BOOST_SERIALIZATION_NVP(m_adopted_policies)
-            & BOOST_SERIALIZATION_NVP(m_initial_adopted_policies)
-            & BOOST_SERIALIZATION_NVP(m_available_policies);
+        ar  & BOOST_SERIALIZATION_NVP(m_techs);
 
-        if (Archive::is_loading::value && version < 2) {
+        if (Archive::is_loading::value && version < 3) {
             m_adopted_policies.clear();
             m_initial_adopted_policies.clear();
             m_available_policies.clear();
+        } else {
+            ar  & BOOST_SERIALIZATION_NVP(m_adopted_policies)
+                & BOOST_SERIALIZATION_NVP(m_initial_adopted_policies)
+                & BOOST_SERIALIZATION_NVP(m_available_policies);
         }
     }
 
     ar  & BOOST_SERIALIZATION_NVP(m_meters)
         & BOOST_SERIALIZATION_NVP(m_research_queue)
         & BOOST_SERIALIZATION_NVP(m_research_progress)
-        & BOOST_SERIALIZATION_NVP(m_production_queue)
-        & BOOST_SERIALIZATION_NVP(m_available_building_types)
+        & BOOST_SERIALIZATION_NVP(m_production_queue);
+
+    if (Archive::is_loading::value && version < 3) {
+        m_influence_queue.clear();
+    } else {
+        ar  & BOOST_SERIALIZATION_NVP(m_influence_queue);
+    }
+
+    ar  & BOOST_SERIALIZATION_NVP(m_available_building_types)
         & BOOST_SERIALIZATION_NVP(m_available_part_types)
         & BOOST_SERIALIZATION_NVP(m_available_hull_types)
         & BOOST_SERIALIZATION_NVP(m_supply_system_ranges)
