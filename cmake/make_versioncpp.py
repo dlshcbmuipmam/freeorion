@@ -44,27 +44,27 @@ class Generator(object):
 
     def execute(self, version, branch, build_no, build_sys):
         if build_no == INVALID_BUILD_NO:
-            print "WARNING: Can't determine git commit!"
+            print("WARNING: Can't determine git commit!")
 
         if os.path.isfile(self.outfile):
             with open(self.outfile) as check_file:
                 check_file_contents = check_file.read()
                 if build_no == INVALID_BUILD_NO:
                     if version in check_file_contents:
-                        print "Version matches version in existing Version.cpp, skip regenerating it"
+                        print("Version matches version in existing Version.cpp, skip regenerating it")
                         return
                 elif build_no in check_file_contents:
-                    print "Build number matches build number in existing Version.cpp, skip regenerating it"
+                    print("Build number matches build number in existing Version.cpp, skip regenerating it")
                     return
 
         try:
             with open(self.infile) as template_file:
                 template = Template(template_file.read())
         except:
-            print "WARNING: Can't access %s, %s not updated!" % (self.infile, self.outfile)
+            print( "WARNING: Can't access {}, {} not updated!".format(self.infile, self.outfile) )
             return
 
-        print "Writing file: %s" % self.outfile
+        print( "Writing file: {}".format(self.outfile) )
         with open(self.outfile, "w") as generated_file:
             generated_file.write(self.compile_output(template, version, branch, build_no, build_sys))
 
