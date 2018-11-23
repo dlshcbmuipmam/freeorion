@@ -92,7 +92,7 @@ class NsisInstScriptGenerator(Generator):
                 FreeOrion_DLL_LIST_INSTALL="\n  ".join(['File "..\\' + fname + '"' for fname in dll_files]),
                 FreeOrion_DLL_LIST_UNINSTALL="\n  ".join(['Delete "$INSTDIR\\' + fname + '"' for fname in dll_files]))
         else:
-            print "WARNING: no dll files for installer package found"
+            print("WARNING: no dll files for installer package found")
             return template.substitute(
                 FreeOrion_VERSION=version,
                 FreeOrion_BRANCH=branch,
@@ -103,8 +103,8 @@ class NsisInstScriptGenerator(Generator):
 
 
 if 3 != len(sys.argv):
-    print "ERROR: invalid parameters."
-    print "make_versioncpp.py <project rootdir> <build system name>"
+    print("ERROR: invalid parameters.")
+    print("make_versioncpp.py <project rootdir> <build system name>")
     quit()
 
 os.chdir(sys.argv[1])
@@ -134,9 +134,9 @@ try:
     timestamp = float(check_output(["git", "show", "-s", "--format=%ct", "HEAD"]).strip())
     build_no = ".".join([datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d"), commit])
 except:
-    print "WARNING: git not installed or not setup correctly"
+    print("WARNING: git not installed or not setup correctly")
 
 for generator in generators:
     generator.execute(version, branch, build_no, build_sys)
 
-print "Building v%s %sbuild %s" % (version, branch, build_no)
+print( "Building v{} {}build {}" % (version, branch, build_no) )
