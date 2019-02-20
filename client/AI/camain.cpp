@@ -24,7 +24,7 @@ unroll and hide the stack trace, print a message and still crash anyways. */
 #define FREEORION_CAMAIN_KEEP_STACKTRACE
 #endif
 
-#ifndef FREEORION_WIN32
+#if !defined(FREEORION_WIN32) || defined(FREEORION_MINGW)
 int main(int argc, char* argv[]) {
     InitDirs(argv[0]);
     std::vector<std::string> args;

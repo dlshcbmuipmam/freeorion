@@ -65,7 +65,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
-if(WIN32)
+if(WIN32 AND NOT MINGW)
     # Location of the FreeOrionSDK root
     set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/..")
     # Search dependency DLLs inside FreeOrionSDK
@@ -142,23 +142,29 @@ add_compile_options(
     $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
 )
 
+if(WIN32 AND NOT MINGW)
+    set_property(DIRECTORY APPEND
+        PROPERTY COMPILE_DEFINITIONS
+            # Set minimum Windows target version to WindowsXP
+            # https://msdn.microsoft.com/en-us/library/aa383745.aspx
+            $<$<PLATFORM_ID:Windows>:_WIN32_WINNT=_WIN32_WINNT_WINXP>
+            # Default to unicode variants when using Win32 API
+            # https://msdn.microsoft.com/en-us/library/dybsewaf.aspx
+            $<$<PLATFORM_ID:Windows>:_UNICODE>
+            # Disable "'<func>' was declared deprecated" warning
+            # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
+            $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>
+            # Disable '<func>': Function call with parameters that may be unsafe" warning
+            # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
+            $<$<PLATFORM_ID:Windows>:_SCL_SECURE_NO_WARNINGS>
+            # Disable '<func>': The POSIX name for this item is deprecated." warning
+            # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
+            $<$<PLATFORM_ID:Windows>:_CRT_NONSTDC_NO_WARNINGS>
+    )
+endif()
+
 set_property(DIRECTORY APPEND
     PROPERTY COMPILE_DEFINITIONS
-        # Set minimum Windows target version to WindowsXP
-        # https://msdn.microsoft.com/en-us/library/aa383745.aspx
-        $<$<PLATFORM_ID:Windows>:_WIN32_WINNT=_WIN32_WINNT_WINXP>
-        # Default to unicode variants when using Win32 API
-        # https://msdn.microsoft.com/en-us/library/dybsewaf.aspx
-        $<$<PLATFORM_ID:Windows>:_UNICODE>
-        # Disable "'<func>' was declared deprecated" warning
-        # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
-        $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>
-        # Disable '<func>': Function call with parameters that may be unsafe" warning
-        # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
-        $<$<PLATFORM_ID:Windows>:_SCL_SECURE_NO_WARNINGS>
-        # Disable '<func>': The POSIX name for this item is deprecated." warning
-        # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
-        $<$<PLATFORM_ID:Windows>:_CRT_NONSTDC_NO_WARNINGS>
 
         # Define platform specific macros
         $<$<PLATFORM_ID:Windows>:FREEORION_WIN32>
@@ -167,6 +173,13 @@ set_property(DIRECTORY APPEND
         $<$<PLATFORM_ID:FreeBSD>:FREEORION_FREEBSD>
         $<$<PLATFORM_ID:OpenBSD>:FREEORION_OPENBSD>
 )
+
+if(MINGW)
+    set_property(DIRECTORY APPEND
+        PROPERTY COMPILE_DEFINITIONS 
+            FREEORION_MINGW
+    )
+endif()
 
 if(WIN32 AND MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
@@ -231,6 +244,13 @@ if(NOT BUILD_HEADLESS)
     find_package(Vorbis REQUIRED)
 endif()
 
+if(MINGW)
+    find_library(WS2_32_LIBRARY ws2_32)
+    find_library(WSOCK32_LIBRARY wsock32)
+    find_library(BCRYPT_LIBRARY bcrypt)
+    find_library(ICONV_LIBRARY iconv)
+endif()
+
 if(APPLE)
     find_library(CORE_FOUNDATION_LIBRARY CoreFoundation)
     find_library(ICONV_LIBRARY iconv)
@@ -253,13 +273,13 @@ set_property(DIRECTORY APPEND
     PROPERTY COMPILE_DEFINITIONS
         # Disable Boost auto-linking
         # http://www.boost.org/doc/libs/1_59_0/libs/config/doc/html/index.html#boost_config.configuring_boost_for_your_platform.user_settable_options
-        BOOST_ALL_NO_LINK
+        BOOST_ALL_NO_LIB
 
         # Boost iostreams doesn't honor BOOST_ALL_NO_LINK when linking zlib.
-        # It also tries to link by default to the boost in-source zlib librar,
+        # It also tries to link by default to the boost in-source zlib library,
         # which we don't want.
         # http://www.boost.org/doc/libs/1_59_0/boost/iostreams/detail/config/zlib.hpp
-        $<$<PLATFORM_ID:Windows>:BOOST_ZLIB_BINARY=zlib.lib>
+        $<$<PLATFORM_ID:Windows>:BOOST_ZLIB_BINARY=zlib.a>
 
         # Link all boost libraries dynamically
         # http://www.boost.org/doc/libs/1_59_0/libs/config/doc/html/index.html#boost_config.configuring_boost_for_your_platform.user_settable_options
@@ -309,8 +329,13 @@ if(Apple)
     )
 endif()
 
+if(NOT MINGW)
+    add_library(freeorioncommon "")
+endif()
 
-add_library(freeorioncommon "")
+if(MINGW)
+    add_library(freeorioncommon STATIC "")
+endif()
 
 if(WIN32)
     set_property(TARGET freeorioncommon
@@ -361,11 +386,11 @@ target_link_libraries(freeorioncommon
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${ZLIB_LIBRARIES}
+    ${BCRYPT_LIBRARY}
     ${CORE_FOUNDATION_LIBRARY}
 )
 
 add_dependencies(freeorioncommon freeorionversion)
-
 
 add_library(freeorionparseobj OBJECT "")
 
@@ -379,13 +404,6 @@ set_property(TARGET freeorionparseobj
     PROPERTY
     POSITION_INDEPENDENT_CODE ON
 )
-
-if(WIN32)
-    set_property(TARGET freeorionparse
-        PROPERTY
-        OUTPUT_NAME Parsers
-    )
-endif()
 
 target_compile_options(freeorionparseobj
     PRIVATE
@@ -403,8 +421,20 @@ target_compile_definitions(freeorionparseobj
         -DFREEORION_BUILD_PARSE
 )
 
+if(NOT MINGW)
+    add_library(freeorionparse $<TARGET_OBJECTS:freeorionparseobj>)
+endif()
 
-add_library(freeorionparse $<TARGET_OBJECTS:freeorionparseobj>)
+if(MINGW)
+    add_library(freeorionparse STATIC $<TARGET_OBJECTS:freeorionparseobj>)
+endif()
+
+if(WIN32)
+    set_property(TARGET freeorionparse
+        PROPERTY
+        OUTPUT_NAME Parsers
+    )
+endif()
 
 target_compile_options(freeorionparse
     PRIVATE
@@ -467,12 +497,13 @@ target_link_libraries(freeoriond
     ${Boost_PYTHON_LIBRARY}
     ${Boost_LOG_LIBRARY}
     ${Boost_LOG_SETUP_LIBRARY}
+    ${WS2_32_LIBRARY}
+    ${WSOCK32_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
 )
 
 target_dependencies_copy_to_build(freeoriond)
 target_dependent_data_symlink_to_build(freeoriond ${PROJECT_SOURCE_DIR}/default)
-
 
 add_executable(freeorionca "")
 
@@ -510,6 +541,8 @@ target_link_libraries(freeorionca
     ${Boost_PYTHON_LIBRARY}
     ${Boost_LOG_LIBRARY}
     ${Boost_LOG_SETUP_LIBRARY}
+    ${WS2_32_LIBRARY}
+    ${WSOCK32_LIBRARY}
     ${CMAKE_THREAD_LIBS_INIT}
 )
 
@@ -605,6 +638,12 @@ if(NOT BUILD_HEADLESS)
         )
     endif()
 
+    if(MINGW)
+        target_link_libraries(freeorion
+            mingw32
+        )
+    endif()
+
     target_link_libraries(freeorion
         freeorioncommon
         freeorionparse
@@ -616,10 +655,21 @@ if(NOT BUILD_HEADLESS)
         ${SDL_LIBRARIES}
         ${OGG_LIBRARIES}
         ${VORBIS_LIBRARIES}
-        ${ZLIB_LIBRARIES}
+        ${Boost_DATE_TIME_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        ${Boost_IOSTREAMS_LIBRARY}
         ${Boost_LOCALE_LIBRARY}
         ${Boost_LOG_LIBRARY}
         ${Boost_LOG_SETUP_LIBRARY}
+        ${Boost_REGEX_LIBRARY}
+        ${Boost_SERIALIZATION_LIBRARY}
+        ${Boost_SIGNALS_LIBRARY}
+        ${Boost_SYSTEM_LIBRARY}
+        ${Boost_THREAD_LIBRARY}
+        ${ZLIB_LIBRARIES}
+        ${WS2_32_LIBRARY}
+        ${WSOCK32_LIBRARY}
+        ${BCRYPT_LIBRARY}
         ${ICONV_LIBRARY}
         ${CMAKE_THREAD_LIBS_INIT}
     )

@@ -53,7 +53,7 @@ int mainSetupAndRun();
 int mainConfigOptionsSetup(const std::vector<std::string>& args);
 
 
-#if defined(FREEORION_LINUX) || defined(FREEORION_FREEBSD) || defined(FREEORION_OPENBSD)
+#if defined(FREEORION_LINUX) || defined(FREEORION_FREEBSD) || defined(FREEORION_OPENBSD) || defined(FREEORION_MINGW)
 int main(int argc, char* argv[]) {
     // copy command line arguments to vector
     std::vector<std::string> args;
@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 #endif
-#ifdef FREEORION_WIN32
+#if defined(FREEORION_WIN32) && !defined(FREEORION_MINGW)
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
     // copy UTF-16 command line arguments to UTF-8 vector
     std::vector<std::string> args;
