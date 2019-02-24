@@ -70,6 +70,8 @@ Step by step procedure:
    * Unzip the SDK archive contents into the project directory.
    * Execute the `bootstrap.bat` within the project directory. This will clone
      the FreeOrion repository and place the dependencies at the correct place.
+   * Alternatively, you can clone your own project repository without running 
+     `bootstrap.bat`.
  * On Max OS X, Linux and other Operating Systems:
    * Navigate into the project directory.
    * Clone the project via Git:
@@ -111,6 +113,27 @@ Step by step procedure:
    * Compile the whole project by selecting the `Build` -> `Build Solution`
      menu entry.
 
+ * On Windows (cmake):
+   * Create a `build` directory, which will contain all compile FreeOrion
+     build artifacs.
+   * Change into the `build` directory on the command line.
+   * Execute cmake to generate Makefiles:
+
+     ```
+     cmake .. -G "Visual Studio 15 2017"
+     ```
+   * Compile the whole project by calling `MSBuild.exe -p:Configuration=Release`
+     within the build directory. In case you want to utilize multiple CPU
+     cores, you can add the `-m` option to the command.
+   * Alternatively, you can compile the project by the Visual Studio GUI.
+   * Change into the `Release` directory, which contains the executables.
+   * Create a symbolic link to the data directory inside the build directoy
+     by invoking:
+
+     ```
+     ln -s ../../default .
+     ```
+
  * On Mac OS X:
    * Create a `build` directory, which will contain all compile FreeOrion
      build artifacs.
@@ -140,7 +163,7 @@ Step by step procedure:
      by invoking:
 
      ```
-     ln -s ../freeorion/default .
+     ln -s ../default .
      ```
 
 This will leave you with a build of FreeOrion executables.
