@@ -27,6 +27,7 @@ message(STATUS "Build type CMAKE_BUILD_TYPE set to ${CMAKE_BUILD_TYPE}")
 include(UseCompilerCache)
 find_compiler_cache(PROGRAM ccache)
 
+
 ##
 ## Global project configuration
 ##
@@ -39,7 +40,7 @@ include(GNUInstallDirs)
 include(UseCodeCoverage)
 include(TargetDependencies)
 
-set(FreeOrion_VERSION 0.4.8)
+set(FreeOrion_VERSION 0.4.8+)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -75,10 +76,10 @@ if(WIN32)
 endif()
 
 if(APPLE)
-    set(FreeOrionSDK_VERSION 8)
-    set(FreeOrionSDK_FILE "FreeOrionSDK_${FreeOrionSDK_VERSION}_Clang-MacOSX-10.9-x86_64.dmg")
+    set(FreeOrionSDK_VERSION 10)
+    set(FreeOrionSDK_FILE "FreeOrionSDK_${FreeOrionSDK_VERSION}_Clang-MacOSX-10.9-x86_64.tar.bz2")
     if(NOT EXISTS "${CMAKE_BINARY_DIR}/${FreeOrionSDK_FILE}")
-	file(DOWNLOAD
+    file(DOWNLOAD
             "https://github.com/freeorion/freeorion-sdk/releases/download/v${FreeOrionSDK_VERSION}/${FreeOrionSDK_FILE}"
             "${CMAKE_BINARY_DIR}/${FreeOrionSDK_FILE}"
             SHOW_PROGRESS
@@ -90,9 +91,8 @@ if(APPLE)
     endif()
     if(NOT "${FreeOrionSDK_VERSION}" EQUAL "${FreeOrionSDK_INSTALL_VERSION}")
         file(REMOVE_RECURSE "${CMAKE_BINARY_DIR}/dep")
-        execute_process(COMMAND /usr/bin/hdiutil attach "${CMAKE_BINARY_DIR}/${FreeOrionSDK_FILE}")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfj /Volumes/FreeOrionSDK/dep.tar.bz2 WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
-        execute_process(COMMAND /usr/bin/hdiutil detach "/Volumes/FreeOrionSDK")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/dep")
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfj "${CMAKE_BINARY_DIR}/${FreeOrionSDK_FILE}" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/dep")
         file(WRITE "${CMAKE_BINARY_DIR}/dep/sdkversion" "${FreeOrionSDK_VERSION}")
     endif()
     # Location of the FreeOrionSDK root
@@ -140,6 +140,9 @@ add_compile_options(
 
     # Enable C++ Exception unwind mechanics with DLL support
     $<$<CXX_COMPILER_ID:MSVC>:/EHsc>
+
+    # Fix Fatal Error C1128: number of sections exceeded object file format limit : compile with /bigobj on SerializeEmpire.cpp
+    $<$<CXX_COMPILER_ID:MSVC>:/bigobj>
 )
 
 set_property(DIRECTORY APPEND
@@ -159,6 +162,9 @@ set_property(DIRECTORY APPEND
         # Disable '<func>': The POSIX name for this item is deprecated." warning
         # https://msdn.microsoft.com/en-us/library/ttcz0bys.aspx
         $<$<PLATFORM_ID:Windows>:_CRT_NONSTDC_NO_WARNINGS>
+
+        # Suppress "Boost.Config is older than your compiler version" warning
+        $<$<PLATFORM_ID:Windows>:BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE>
 
         # Define platform specific macros
         $<$<PLATFORM_ID:Windows>:FREEORION_WIN32>
@@ -205,7 +211,6 @@ find_package(Boost ${MINIMUM_BOOST_VERSION}
         log_setup
         regex
         serialization
-        signals
         system
         thread
     REQUIRED)
@@ -253,9 +258,9 @@ set_property(DIRECTORY APPEND
     PROPERTY COMPILE_DEFINITIONS
         # Disable Boost auto-linking
         # http://www.boost.org/doc/libs/1_59_0/libs/config/doc/html/index.html#boost_config.configuring_boost_for_your_platform.user_settable_options
-        BOOST_ALL_NO_LINK
+        BOOST_ALL_NO_LIB
 
-        # Boost iostreams doesn't honor BOOST_ALL_NO_LINK when linking zlib.
+        # Boost iostreams doesn't honor BOOST_ALL_NO_LIB when linking zlib.
         # It also tries to link by default to the boost in-source zlib librar,
         # which we don't want.
         # http://www.boost.org/doc/libs/1_59_0/boost/iostreams/detail/config/zlib.hpp
@@ -309,10 +314,14 @@ if(Apple)
     )
 endif()
 
+if(NOT WIN32)
+    add_library(freeorioncommon "")
+endif()
 
-add_library(freeorioncommon "")
 
 if(WIN32)
+    add_library(freeorioncommon STATIC "")
+
     set_property(TARGET freeorioncommon
         PROPERTY
         OUTPUT_NAME Common
@@ -357,7 +366,6 @@ target_link_libraries(freeorioncommon
     ${Boost_LOG_SETUP_LIBRARY}
     ${Boost_REGEX_LIBRARY}
     ${Boost_SERIALIZATION_LIBRARY}
-    ${Boost_SIGNALS_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${ZLIB_LIBRARIES}
@@ -380,13 +388,6 @@ set_property(TARGET freeorionparseobj
     POSITION_INDEPENDENT_CODE ON
 )
 
-if(WIN32)
-    set_property(TARGET freeorionparse
-        PROPERTY
-        OUTPUT_NAME Parsers
-    )
-endif()
-
 target_compile_options(freeorionparseobj
     PRIVATE
         $<$<CXX_COMPILER_ID:GNU>:-fvisibility=hidden>
@@ -403,8 +404,18 @@ target_compile_definitions(freeorionparseobj
         -DFREEORION_BUILD_PARSE
 )
 
+if(NOT WIN32)
+    add_library(freeorionparse $<TARGET_OBJECTS:freeorionparseobj>)
+endif()
 
-add_library(freeorionparse $<TARGET_OBJECTS:freeorionparseobj>)
+if(WIN32)
+    add_library(freeorionparse STATIC $<TARGET_OBJECTS:freeorionparseobj>)
+
+    set_property(TARGET freeorionparse
+        PROPERTY
+        OUTPUT_NAME Parsers
+    )
+endif()
 
 target_compile_options(freeorionparse
     PRIVATE
@@ -429,7 +440,6 @@ if(APPLE)
         LINK_FLAGS "-undefined dynamic_lookup"
     )
 endif()
-
 
 add_executable(freeoriond "")
 
@@ -472,7 +482,6 @@ target_link_libraries(freeoriond
 
 target_dependencies_copy_to_build(freeoriond)
 target_dependent_data_symlink_to_build(freeoriond ${PROJECT_SOURCE_DIR}/default)
-
 
 add_executable(freeorionca "")
 
@@ -628,6 +637,15 @@ if(NOT BUILD_HEADLESS)
     target_dependent_data_symlink_to_build(freeorion ${PROJECT_SOURCE_DIR}/default)
 endif()
 
+if(WIN32)
+    add_custom_command(TARGET freeorion POST_BUILD
+        COMMAND
+            ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_PREFIX_PATH}/bin/python27.dll" "$<TARGET_FILE_DIR:freeorion>"
+        COMMAND
+            ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_PREFIX_PATH}/bin/python27.zip" "$<TARGET_FILE_DIR:freeorion>" 
+    )
+endif()
+
 if(APPLE)
     add_custom_command(TARGET freeorion POST_BUILD
         COMMAND
@@ -668,8 +686,6 @@ if(APPLE)
            ${CMAKE_COMMAND} -E copy_if_different "${Boost_PYTHON_LIBRARY}" "$<TARGET_FILE_DIR:freeorion>/../SharedSupport"
         COMMAND
            ${CMAKE_COMMAND} -E copy_if_different "${Boost_SERIALIZATION_LIBRARY}" "$<TARGET_FILE_DIR:freeorion>/../SharedSupport"
-        COMMAND
-           ${CMAKE_COMMAND} -E copy_if_different "${Boost_SIGNALS_LIBRARY}" "$<TARGET_FILE_DIR:freeorion>/../SharedSupport"
         COMMAND
            ${CMAKE_COMMAND} -E copy_if_different "${Boost_SYSTEM_LIBRARY}" "$<TARGET_FILE_DIR:freeorion>/../SharedSupport"
         COMMAND
@@ -763,15 +779,18 @@ if(WIN32)
     install(
         FILES
         OpenAL32.dll
-        boost_date_time-vc90-mt-1_44.dll
-        boost_filesystem-vc90-mt-1_44.dll
-        boost_iostreams-vc90-mt-1_44.dll
-        boost_python-vc90-mt-1_44.dll
-        boost_regex-vc90-mt-1_44.dll
-        boost_serialization-vc90-mt-1_44.dll
-        boost_signals-vc90-mt-1_44.dll
-        boost_system-vc90-mt-1_44.dll
-        boost_thread-vc90-mt-1_44.dll
+        boost_chrono.dll
+        boost_date_time.dll
+        boost_filesystem.dll
+        boost_iostreams.dll
+        boost_locale.dll
+        boost_log.dll
+        boost_log_setup.dll
+        boost_python.dll
+        boost_regex.dll
+        boost_serialization.dll
+        boost_system.dll
+        boost_thread.dll
         glew32.dll
         libexpat.dll
         libogg.dll

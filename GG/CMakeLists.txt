@@ -84,14 +84,15 @@ set(MINIMUM_BOOST_VERSION 1.58.0)
 
 if(NOT USE_STATIC_LIBS)
     add_definitions(
-        -DBOOST_ALL_NO_LINK
+        -DBOOST_ALL_NO_LIB
         -DBOOST_ALL_DYN_LINK
+        -DBOOST_LOG_NO_LIB
         -DBOOST_LOG_DYN_LINK
     )
 endif()
 
 set(Boost_USE_STATIC_LIBS ${USE_STATIC_LIBS})
-find_package(Boost ${MINIMUM_BOOST_VERSION} COMPONENTS date_time filesystem regex signals system thread log REQUIRED)
+find_package(Boost ${MINIMUM_BOOST_VERSION} COMPONENTS date_time filesystem regex system thread log REQUIRED)
 
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
