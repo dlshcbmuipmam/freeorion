@@ -159,7 +159,7 @@ add_compile_options(
 )
 
 # Determine minimum Windows target (see FreeOrion SDK)
-if(WIN32)
+if(WIN32 AND MSVC)
     string(REGEX REPLACE "^v([1-9][0-9]*)(.*)$" "\\1;\\2" _VS_PLATFORM_TOOLSET "${CMAKE_VS_PLATFORM_TOOLSET}")
     message( STATUS "Toolset ${CMAKE_VS_PLATFORM_TOOLSET} regex ${_VS_PLATFORM_TOOLSET}")
     list(GET _VS_PLATFORM_TOOLSET 1 _VS_PLATFORM_TOOLSET_TARGET)
